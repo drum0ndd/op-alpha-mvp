@@ -1,0 +1,19 @@
+{
+  "name": "@op-alpha/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc --noEmit false --outDir dist --module NodeNext --moduleResolution NodeNext --declaration",
+    "lint": "tsc --noEmit",
+    "test": "echo contracts-ok"
+  },
+  "dependencies": {
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0"
+  }
+}

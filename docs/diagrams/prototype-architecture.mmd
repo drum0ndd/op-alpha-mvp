@@ -1,0 +1,29 @@
+flowchart TB
+    subgraph APP["Um aplicativo Expo"]
+        UI["Catálogo · Coleção · Conta/Login"]
+        SCAN["/scan · Foto local + busca pelo código<br/>confirmação de impressão aprovada"]
+        LENS["Barra de lentes local<br/>ícone, nome e destaque; sem especialidades"]
+        STATE["Sessão e consultas TanStack Query"]
+        HTTP["Cliente HTTP + contratos Zod"]
+        UI --> LENS
+        UI --> STATE --> HTTP
+        UI --> SCAN --> HTTP
+    end
+    subgraph API["Uma API NestJS modular"]
+        CTRL["Controllers HTTP"]
+        USE["Serviços / casos de uso<br/>Identidade · Catálogo · Coleção: leitura e inclusão"]
+        RULES["Políticas pequenas e testáveis<br/>BRL · publicação · verificação futura"]
+        DATA["Prisma / repositories específicos"]
+        CTRL --> USE
+        USE --> RULES
+        USE --> DATA
+    end
+    HTTP --> CTRL
+    DATA --> DB[("PostgreSQL")]
+    JOB["Importação CLI/job no mesmo repositório"]
+    PROVIDER["Provider / Adapter<br/>obter e validar fora da transação"]
+    SOURCE["Fixture atual / fonte futura configurada"]
+    JOB --> PROVIDER --> SOURCE
+    JOB --> DATA
+    FUTURE["Criação/edição futura<br/>proposta → verificação oficial → persistência"]
+    FUTURE -. "contratos e política preparados; sem endpoint" .-> RULES

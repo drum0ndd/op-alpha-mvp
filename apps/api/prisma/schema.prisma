@@ -1,0 +1,318 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Lens {
+  COLLECTOR
+  INVESTOR
+  PLAYER
+}
+
+enum CardLanguage {
+  EN
+  JP
+  PT
+}
+
+enum CardCondition {
+  NM
+  LP
+  MP
+  HP
+  DMG
+}
+
+enum PriceKind {
+  LISTING
+  SOLD
+  FLOOR
+  MARKET
+  OFFER_STATISTIC
+}
+
+enum SourceType {
+  OFFICIAL
+  MARKETPLACE
+  META
+  COMMUNITY
+  MANUAL
+}
+
+enum RecommendationAction {
+  BUY
+
+  BUY_BELOW
+  HOLD
+  SELL
+  AVOID
+  SPECULATIVE
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum LiquidityLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TrendDirection {
+  DOWN
+  STABLE
+  UP
+}
+
+model User {
+  id        String          @id @default(uuid())
+  email     String          @unique
+  passwordHash String?
+  preferredLens Lens @default(COLLECTOR)
+  sessions Session[]
+  name      String
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  lenses    UserLens[]
+  holdings  Holding[]
+  watchlist WatchlistItem[]
+  decks     Deck[]
+  alerts    Alert[]
+}
+
+model UserLens {
+  id        String  @id @default(uuid())
+  userId    String
+  lens      Lens
+  weight    Decimal @db.Decimal(4, 3)
+  isPrimary Boolean @default(false)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lens])
+  @@index([userId, isPrimary])
+}
+
+model CardSet {
+  id          String    @id @default(uuid())
+  code        String    @unique
+  name        String
+  releaseDate DateTime?
+  cards       Card[]
+  printings   CardVariant[]
+}
+
+model Card {
+  id        String        @id @default(uuid())
+  code      String        @unique
+  name      String
+  color     String?
+  cardType  String?
+  rarity    String?
+  setId     String
+  set       CardSet       @relation(fields: [setId], references: [id])
+  variants  CardVariant[]
+  deckCards DeckCard[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([name])
+  @@index([setId, rarity])
+}
+
+model CardVariant {
+  id              String           @id @default(uuid())
+  cardId          String
+  externalKey     String?          @unique
+  catalogSource   String?
+  sourcePrintingId String?
+  sourceUrl       String?
+  collectedAt     DateTime?
+  catalogData     Json?
+  publicationApproved Boolean @default(false)
+  setId           String?
+  set             CardSet? @relation(fields: [setId], references: [id])
+  variantName     String
+  language        CardLanguage
+  imageUrl        String?
+  artType         String?
+  card            Card             @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  prices          PricePoint[]
+  holdings        Holding[]
+  watchlist       WatchlistItem[]
+  recommendations Recommendation[]
+
+  @@index([cardId, variantName, language])
+  @@unique([catalogSource, sourcePrintingId])
+  @@index([cardId, language])
+}
+
+model DataSource {
+  id             String       @id @default(uuid())
+  key            String       @unique
+  name           String
+  type           SourceType
+  baseUrl        String?
+  isAuthorized   Boolean      @default(false)
+  reliabilityPct Int          @default(50)
+  prices         PricePoint[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model PricePoint {
+  id         String        @id @default(uuid())
+  variantId  String
+  sourceId   String
+  observedAt DateTime
+  amount     Decimal       @db.Decimal(12, 2)
+  currency   String        @db.VarChar(3)
+  condition  CardCondition
+  kind       PriceKind
+  region     String?
+  sampleSize Int?
+  sourceRef  String?
+  variant    CardVariant   @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  source     DataSource    @relation(fields: [sourceId], references: [id])
+
+  @@index([variantId, observedAt(sort: Desc)])
+  @@index([sourceId, observedAt(sort: Desc)])
+  @@index([currency, region])
+}
+
+model Holding {
+  id                  String        @id @default(uuid())
+  userId              String
+  variantId           String
+  quantity            Int
+  condition           CardCondition
+  acquisitionAt       DateTime?
+  acquisitionPrice    Decimal?      @db.Decimal(12, 2)
+  acquisitionCurrency String?       @db.VarChar(3)
+  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  variant             CardVariant   @relation(fields: [variantId], references: [id])
+
+  @@index([userId, variantId])
+}
+
+model WatchlistItem {
+  id          String      @id @default(uuid())
+  userId      String
+  variantId   String
+  targetPrice Decimal?    @db.Decimal(12, 2)
+  currency    String?     @db.VarChar(3)
+  reason      String?
+  isActive    Boolean     @default(true)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  variant     CardVariant @relation(fields: [variantId], references: [id])
+
+  @@unique([userId, variantId])
+}
+
+model Deck {
+  id         String     @id @default(uuid())
+  userId     String
+  name       String
+  leaderCode String?
+  isActive   Boolean    @default(true)
+  winRate    Decimal?   @db.Decimal(5, 2)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cards      DeckCard[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@index([userId, isActive])
+}
+
+model DeckCard {
+  id       String @id @default(uuid())
+  deckId   String
+  cardId   String
+  quantity Int
+  deck     Deck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  card     Card   @relation(fields: [cardId], references: [id])
+
+  @@unique([deckId, cardId])
+}
+
+model Recommendation {
+  id            String                   @id @default(uuid())
+  variantId     String
+  lens          Lens
+  action        RecommendationAction
+  alphaScore    Int
+  fairPrice     Decimal?                 @db.Decimal(12, 2)
+  currency      String?                  @db.VarChar(3)
+  risk          RiskLevel
+  liquidity     LiquidityLevel
+  trend         TrendDirection
+  confidence    Int
+  rationale     String
+  engineVersion String
+  validUntil    DateTime?
+  createdAt     DateTime                 @default(now())
+  variant       CardVariant              @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  evidence      RecommendationEvidence[]
+
+  @@index([lens, createdAt(sort: Desc)])
+  @@index([variantId, lens, createdAt(sort: Desc)])
+}
+
+model RecommendationEvidence {
+  id               String         @id @default(uuid())
+  recommendationId String
+  factor           String
+  value            Decimal        @db.Decimal(10, 3)
+  weight           Decimal        @db.Decimal(6, 3)
+  explanation      String
+  recommendation   Recommendation @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
+}
+
+model Alert {
+  id        String    @id @default(uuid())
+  userId    String
+  type      String
+  title     String
+  body      String
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt(sort: Desc)])
+}
+
+model Session {
+  tokenHash String @id
+  userId String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, expiresAt])
+}
+
+model CatalogSyncRun {
+  id String @id @default(uuid())
+  provider String
+  collection String
+  startedAt DateTime @default(now())
+  finishedAt DateTime?
+  durationMs Int?
+  status String
+  count Int @default(0)
+  failure String?
+  @@index([provider, collection, startedAt])
+}
+
+model CatalogCache {
+  key String @id
+  etag String?
+  lastModified String?
+  entries Json
+  updatedAt DateTime @updatedAt
+}

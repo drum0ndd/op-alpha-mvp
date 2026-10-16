@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "OP Alpha", "slug": "op-alpha", "version": "0.1.0",
+    "orientation": "portrait", "scheme": "opalpha", "userInterfaceStyle": "dark",
+    "plugins": ["expo-router", ["expo-image-picker", {
+      "photosPermission": "Selecione uma foto da sua carta para identificação assistida.",
+      "cameraPermission": "Fotografe sua carta para identificação assistida.",
+      "microphonePermission": false
+    }]],
+    "experiments": { "typedRoutes": true },
+    "ios": { "supportsTablet": true },
+    "android": {  },
+    "web": { "bundler": "metro" }
+  }
+}

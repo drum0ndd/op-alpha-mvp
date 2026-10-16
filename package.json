@@ -1,0 +1,26 @@
+{
+  "name": "op-alpha-mvp",
+  "private": true,
+  "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "corepack pnpm --filter @op-alpha/api test:unit",
+    "test:app": "node scripts/test-app.mjs",
+    "test:browser": "node scripts/test-app.mjs --browser-only",
+    "test:database": "node scripts/test-app.mjs --database-only",
+    "db:up": "docker compose --env-file .env -f infra/docker-compose.yml up -d --wait",
+    "db:down": "docker compose --env-file .env -f infra/docker-compose.yml down",
+    "db:migrate": "corepack pnpm --filter @op-alpha/api prisma:migrate",
+    "db:seed": "corepack pnpm --filter @op-alpha/api prisma:seed",
+    "db:config": "docker compose --env-file .env -f infra/docker-compose.yml config --quiet",
+    "typecheck": "turbo lint",
+    "db:deploy": "corepack pnpm --filter @op-alpha/api prisma:deploy"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "turbo": "^2.5.0",
+    "typescript": "^5.9.0"
+  }
+}

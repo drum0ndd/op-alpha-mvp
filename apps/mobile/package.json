@@ -1,0 +1,41 @@
+{
+  "name": "@op-alpha/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "dev": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "build": "expo export --platform web",
+    "lint": "tsc --noEmit",
+    "lint:e2e": "tsc -p e2e/tsconfig.json",
+    "test": "node ../../scripts/test-app.mjs --browser-only"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~56.0.19",
+    "@op-alpha/contracts": "workspace:*",
+    "@op-alpha/design-tokens": "workspace:*",
+    "@tanstack/react-query": "^5.87.0",
+    "expo": "~56.0.0",
+    "expo-constants": "~56.0.23",
+    "expo-image-picker": "~56.0.25",
+    "expo-linear-gradient": "~56.0.4",
+    "expo-linking": "~56.0.16",
+    "expo-router": "~56.2.15",
+    "expo-status-bar": "~56.0.4",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.85.3",
+    "react-native-safe-area-context": "^5.7.0",
+    "react-native-svg": "^15.15.4",
+    "react-native-web": "^0.21.2",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "@types/react": "^19.1.0",
+    "typescript": "^6.0.3"
+  }
+}

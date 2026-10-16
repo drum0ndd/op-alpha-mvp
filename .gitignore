@@ -1,0 +1,20 @@
+node_modules
+.pnpm-store
+.env
+.env.local
+.env.example
+dist
+coverage
+.expo
+.DS_Store
+apps/api/src/generated
+
+.turbo
+dist-test
+playwright-report
+test-results
+
+# Test cases remain local and are not distributed in the public repository.
+apps/api/test/
+apps/mobile/e2e/
+scripts/test-process.test.mjs

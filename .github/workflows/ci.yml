@@ -1,0 +1,25 @@
+name: Application build checks
+on:
+  push:
+    branches: [dev, master, main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: postgresql://opalpha_test:opalpha_test_only@127.0.0.1:5433/opalpha_test?schema=public
+      CI: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: corepack enable
+      - run: corepack pnpm install --frozen-lockfile
+      - run: corepack pnpm --filter @op-alpha/api prisma:generate
+      - run: corepack pnpm typecheck
+      - run: corepack pnpm --filter @op-alpha/api build
+      - run: corepack pnpm --filter @op-alpha/mobile build

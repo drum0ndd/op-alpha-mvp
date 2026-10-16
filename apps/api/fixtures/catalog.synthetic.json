@@ -1,0 +1,30 @@
+[
+  {
+    "source": "synthetic",
+    "printingId": "synthetic-print-1",
+    "code": "SYNTH-001",
+    "name": "Navegante fictício — demonstração",
+    "collection": {
+      "id": "SYNTH-DEMO",
+      "name": "Coleção fictícia de teste"
+    },
+    "language": "EN",
+    "variant": "Impressão fictícia 1",
+    "sourceUrl": "https://example.invalid/synthetic-catalog",
+    "collectedAt": "2026-09-13T00:00:00.000Z"
+  },
+  {
+    "source": "synthetic",
+    "printingId": "synthetic-print-2",
+    "code": "SYNTH-001",
+    "name": "Navegante fictício — demonstração",
+    "collection": {
+      "id": "SYNTH-DEMO",
+      "name": "Coleção fictícia de teste"
+    },
+    "language": "EN",
+    "variant": "Impressão fictícia 2",
+    "sourceUrl": "https://example.invalid/synthetic-catalog",
+    "collectedAt": "2026-09-13T00:00:00.000Z"
+  }
+]

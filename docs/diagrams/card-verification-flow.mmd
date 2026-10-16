@@ -1,0 +1,12 @@
+flowchart TB
+    INPUT["Fonte de scraping configurada / proposta do usuário"]
+    INPUT --> NORMALIZE["Normalização e contratos estritos<br/>carta canônica + impressão"]
+    NORMALIZE --> VERIFY["Adaptador de fonte oficial configurado no servidor<br/>código, impressão, idioma e campos alterados"]
+    VERIFY --> RESULT{"Resultado da verificação"}
+    RESULT -->|verified| EVIDENCE["Evidência vinculada à proposta<br/>sourceKey + referência + data + digest + campos"]
+    RESULT -->|pending / rejected / unavailable| NO_WRITE["Não alterar catálogo público<br/>informar estado / permitir revisão futura"]
+    EVIDENCE --> GATE["Política de publicação e concorrência<br/>identidade estável + expectedVersion"]
+    GATE --> TX["Persistir em transação PostgreSQL<br/>preservar anterior em falha"]
+    TX --> PUBLIC["Disponível no catálogo após aprovação"]
+    NOTE["Estado atual: contratos e política preparados.<br/>Sem fonte real, formulário, endpoint ou escrita de propostas."]
+    NOTE -.-> VERIFY
